@@ -3592,8 +3592,15 @@ Price Alert Page Styles - Futuristic Crypto Design
 
 /* 空状态 */
 .minimal-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
   padding: var(--minimal-space-huge) var(--minimal-space-lg);
+  min-height: 300px;
+  grid-column: 1 / -1; /* 跨越整个网格容器 */
+  width: 100%;
 }
 
 .minimal-empty-icon {
@@ -3602,6 +3609,10 @@ Price Alert Page Styles - Futuristic Crypto Design
   color: var(--minimal-text-disabled);
   margin-bottom: var(--minimal-space-lg);
   line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
 }
 
 .minimal-empty-title {
@@ -4099,7 +4110,7 @@ Price Alert Page Styles - Futuristic Crypto Design
 .minimal-wallets-header {
     display: flex;
     align-items: center;
-    padding: var(--minimal-space-md);
+    padding: var(--minimal-space-lg);
     border-bottom: 1px solid var(--minimal-border-secondary);
     font-size: var(--minimal-font-size-sm);
     color: var(--minimal-text-secondary);
@@ -4110,7 +4121,16 @@ Price Alert Page Styles - Futuristic Crypto Design
     position: relative;
 }
 
-.minimal-wallets-header span {
+    .minimal-wallets-header span,
+    .minimal-wallets-header .minimal-label {
+        flex-shrink: 0;
+        white-space: nowrap;
+        margin-bottom: 0;
+    }
+
+.minimal-wallets-header .minimal-label {
+    /* 覆盖 minimal-label 的默认样式，使其在钱包头部中正确显示 */
+    margin-bottom: 0;
     flex-shrink: 0;
     white-space: nowrap;
 }
@@ -4198,6 +4218,26 @@ Price Alert Page Styles - Futuristic Crypto Design
 
 .minimal-wallet-item:hover .minimal-wallet-actions {
     opacity: 1;
+}
+
+.minimal-wallet-delete-btn {
+    background: transparent;
+    border: 1px solid var(--minimal-border-secondary);
+    color: var(--minimal-text-tertiary);
+    padding: var(--minimal-space-xs) var(--minimal-space-sm);
+    font-size: var(--minimal-font-size-xs);
+    font-weight: var(--minimal-font-weight-light);
+    cursor: pointer;
+    transition: all var(--minimal-transition-normal) ease;
+    border-radius: 0;
+    font-family: inherit;
+    outline: none;
+}
+
+.minimal-wallet-delete-btn:hover {
+    color: var(--minimal-text-primary);
+    border-color: var(--minimal-text-primary);
+    background: transparent;
 }
 
 /* 监控状态区域 */
@@ -4403,7 +4443,7 @@ Price Alert Page Styles - Futuristic Crypto Design
         flex-direction: column;
         align-items: stretch;
         gap: var(--minimal-space-sm);
-        padding: var(--minimal-space-md);
+        padding: var(--minimal-space-lg);
     }
     
     .minimal-wallets-header > * {
@@ -4487,7 +4527,7 @@ Price Alert Page Styles - Futuristic Crypto Design
     }
     
     .minimal-wallets-header {
-        padding: var(--minimal-space-sm) var(--minimal-space-md);
+        padding: var(--minimal-space-md);
     }
     
     .minimal-wallets-list,
@@ -5199,68 +5239,186 @@ Price Alert Page Styles - Futuristic Crypto Design
         display: flex;
         flex-direction: column;
         gap: var(--minimal-space-md);
+        padding: var(--minimal-space-sm) 0;
     }
     
     .transaction-card {
         background: var(--minimal-bg-secondary);
         border: 1px solid var(--minimal-border-secondary);
         border-radius: 0;
-        padding: var(--minimal-space-lg);
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow: hidden;
+        transition: all var(--minimal-transition-normal) ease;
+        cursor: pointer;
+    }
+    
+    .transaction-card:hover {
+        background: var(--minimal-bg-tertiary);
+        border-color: var(--minimal-text-primary);
+        transform: translateY(-1px);
+    }
+    
+    .transaction-card:active {
+        transform: translateY(0);
+    }
+    
+    /* 卡片头部 - 显示最重要的信息 */
+    .transaction-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: var(--minimal-space-md);
+        border-bottom: 1px solid var(--minimal-border-tertiary);
+        background: var(--minimal-bg-primary);
+    }
+    
+    .transaction-card-type {
+        display: flex;
+        align-items: center;
+        gap: var(--minimal-space-sm);
+    }
+    
+    .transaction-type-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        font-size: var(--minimal-font-size-xs);
+        font-weight: var(--minimal-font-weight-medium);
+        flex-shrink: 0;
+    }
+    
+    .transaction-type-icon.in {
+        background: var(--minimal-text-primary);
+        color: var(--minimal-bg-primary);
+    }
+    
+    .transaction-type-icon.out {
+        background: transparent;
+        color: var(--minimal-text-primary);
+        border: 1px solid var(--minimal-text-primary);
+    }
+    
+    .transaction-type-text {
+        font-size: var(--minimal-font-size-base);
+        font-weight: var(--minimal-font-weight-medium);
+        color: var(--minimal-text-primary);
+    }
+    
+    .transaction-chain-badge {
+        padding: var(--minimal-space-xs) var(--minimal-space-sm);
+        background: transparent;
+        border: 1px solid var(--minimal-border-secondary);
+        font-size: var(--minimal-font-size-xs);
+        font-weight: var(--minimal-font-weight-light);
+        color: var(--minimal-text-tertiary);
+        text-transform: uppercase;
+        letter-spacing: var(--minimal-letter-spacing-wider);
+    }
+    
+    /* 卡片主体内容 */
+    .transaction-card-body {
+        padding: var(--minimal-space-md);
         display: flex;
         flex-direction: column;
         gap: var(--minimal-space-sm);
     }
     
-    .transaction-card-row {
+    /* 金额显示 - 突出显示 */
+    .transaction-amount {
         display: flex;
+        align-items: center;
         justify-content: space-between;
-        align-items: flex-start;
-        gap: var(--minimal-space-sm);
-        padding: var(--minimal-space-xs) 0;
+        margin-bottom: var(--minimal-space-sm);
+        padding-bottom: var(--minimal-space-sm);
         border-bottom: 1px solid var(--minimal-border-tertiary);
     }
     
-    .transaction-card-row:last-child {
-        border-bottom: none;
-        padding-bottom: 0;
-    }
-    
-    .transaction-card-label {
-        font-size: var(--minimal-font-size-xs);
+    .transaction-amount-label {
+        font-size: var(--minimal-font-size-sm);
         color: var(--minimal-text-tertiary);
         font-weight: var(--minimal-font-weight-light);
-        min-width: 60px;
-        flex-shrink: 0;
     }
     
-    .transaction-card-value {
-        font-size: var(--minimal-font-size-sm);
-        color: var(--minimal-text-secondary);
-        font-weight: var(--minimal-font-weight-light);
-        text-align: right;
-        word-break: break-all;
-        flex: 1;
-    }
-    
-    .transaction-card-value a {
-        color: var(--minimal-text-primary);
-        text-decoration: none;
-    }
-    
-    /* 空状态和加载状态优化 */
-    .minimal-empty-state,
-    .minimal-loading {
-        padding: var(--minimal-space-huge) var(--minimal-space-md);
-        text-align: center;
-    }
-    
-    .minimal-empty-title {
+    .transaction-amount-value {
         font-size: var(--minimal-font-size-lg);
+        font-weight: var(--minimal-font-weight-medium);
+        color: var(--minimal-text-primary);
+        text-align: right;
+        font-family: 'JetBrains Mono', monospace;
+    }
+    
+    /* 简化的信息行 */
+    .transaction-info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--minimal-space-sm);
         margin-bottom: var(--minimal-space-sm);
     }
     
-    .minimal-empty-text {
-        font-size: var(--minimal-font-size-base);
+    .transaction-info-item {
+        display: flex;
+        flex-direction: column;
+        gap: var(--minimal-space-xs);
+    }
+    
+    .transaction-info-label {
+        font-size: var(--minimal-font-size-xs);
+        color: var(--minimal-text-tertiary);
+        font-weight: var(--minimal-font-weight-light);
+        text-transform: uppercase;
+        letter-spacing: var(--minimal-letter-spacing-wider);
+    }
+    
+    .transaction-info-value {
+        font-size: var(--minimal-font-size-sm);
+        color: var(--minimal-text-secondary);
+        font-weight: var(--minimal-font-weight-light);
+        word-break: break-all;
+        font-family: 'JetBrains Mono', monospace;
+    }
+    
+    /* 时间显示 */
+    .transaction-time {
+        text-align: center;
+        padding-top: var(--minimal-space-sm);
+        border-top: 1px solid var(--minimal-border-tertiary);
+    }
+    
+    .transaction-time-value {
+        font-size: var(--minimal-font-size-xs);
+        color: var(--minimal-text-disabled);
+        font-weight: var(--minimal-font-weight-light);
+    }
+    
+    /* 哈希链接样式 */
+    .transaction-hash-link {
+        color: var(--minimal-text-primary);
+        text-decoration: none;
+        font-family: 'JetBrains Mono', monospace;
+        padding: var(--minimal-space-xs) var(--minimal-space-sm);
+        background: var(--minimal-bg-tertiary);
+        border: 1px solid var(--minimal-border-secondary);
+        display: inline-block;
+        transition: all var(--minimal-transition-normal) ease;
+        font-size: var(--minimal-font-size-xs);
+        word-break: break-all;
+    }
+    
+    .transaction-hash-link:hover {
+        background: var(--minimal-text-primary);
+        color: var(--minimal-bg-primary);
+        border-color: var(--minimal-text-primary);
+    }
+    
+    /* 旧的行样式保留用于兼容 */
+    .transaction-card-row {
+        display: none; /* 隐藏旧样式 */
     }
 }
 
@@ -5306,23 +5464,86 @@ Price Alert Page Styles - Futuristic Crypto Design
     
     /* 交易卡片优化 */
     .transaction-card {
-        padding: var(--minimal-space-md);
+        margin-bottom: var(--minimal-space-sm);
+    }
+    
+    .transaction-card-header {
+        padding: var(--minimal-space-sm);
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--minimal-space-sm);
+    }
+    
+    .transaction-card-type {
+        justify-content: center;
+    }
+    
+    .transaction-type-icon {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .transaction-type-text {
+        font-size: var(--minimal-font-size-sm);
+    }
+    
+    .transaction-chain-badge {
+        align-self: center;
+    }
+    
+    .transaction-card-body {
+        padding: var(--minimal-space-sm);
         gap: var(--minimal-space-xs);
     }
     
-    .transaction-card-row {
+    .transaction-amount {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
         gap: var(--minimal-space-xs);
-        padding: var(--minimal-space-xs) 0;
     }
     
-    .transaction-card-label {
-        min-width: 50px;
+    .transaction-amount-value {
+        font-size: var(--minimal-font-size-base);
+        text-align: center;
+    }
+    
+    .transaction-info-grid {
+        grid-template-columns: 1fr;
+        gap: var(--minimal-space-xs);
+    }
+    
+    .transaction-info-value {
         font-size: var(--minimal-font-size-xs);
     }
     
-    .transaction-card-value {
-        font-size: var(--minimal-font-size-xs);
+    .transaction-hash-link {
+        padding: var(--minimal-space-xs);
+        font-size: 10px;
     }
+}
+
+/* 空状态和加载状态移动端优化 */
+@media (max-width: 768px) {
+    .minimal-empty-state,
+    .minimal-loading {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: var(--minimal-space-huge) var(--minimal-space-md);
+        text-align: center;
+        min-height: 250px;
+    }
+    
+    .minimal-empty-title {
+        font-size: var(--minimal-font-size-lg);
+        margin-bottom: var(--minimal-space-sm);
+    }
+    
+         .minimal-empty-text {
+         font-size: var(--minimal-font-size-base);
+     }
 }
 
 /* 价格提醒页面移动端优化 */
@@ -5468,6 +5689,19 @@ Price Alert Page Styles - Futuristic Crypto Design
     }
 }
 
+/* 桌面端表格行优化 */
+@media (min-width: 769px) {
+    .minimal-table tbody tr {
+        transition: all var(--minimal-transition-normal) ease;
+    }
+    
+    .minimal-table tbody tr:hover {
+        background: var(--minimal-bg-tertiary);
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+}
+
 /* 触摸设备优化 */
 @media (pointer: coarse) {
     /* 增大可点击区域 */
@@ -5498,5 +5732,17 @@ Price Alert Page Styles - Futuristic Crypto Design
     .global-notification-close {
         min-width: 44px;
         min-height: 44px;
+    }
+    
+    /* 交易卡片触摸优化 */
+    .transaction-card {
+        min-height: 48px;
+    }
+    
+    .transaction-hash-link {
+        min-height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 }
