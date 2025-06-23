@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CryptoWatch - 价格提醒</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="minimal-body">
+    <!-- 极简导航 -->
+    <nav class="minimal-nav">
+        <a href="index.html" class="minimal-nav-link">
+                <span>交易监控</span>
+            </a>
+        <a href="price-alert.html" class="minimal-nav-link active">
+                <span>价格提醒</span>
+            </a>
+        </nav>
+        
+    <div class="minimal-container">
+        <!-- 页面标题区域 - 仪式感设计 -->
+        <header class="minimal-header">
+            <h1 class="minimal-title">价格提醒</h1>
+            <div class="minimal-divider"></div>
+            <p class="minimal-subtitle">设置加密货币价格变动提醒</p>
+        </header>
+        
+        <!-- 控制区域 -->
+        <section class="minimal-controls">
+            <div class="minimal-form-group">
+                <label class="minimal-label">价格数据源</label>
+                <select id="api-source-select" class="minimal-select">
+                <option value="coingecko">CoinGecko</option>
+                <option value="binance">Binance</option>
+            </select>
+        </div>
+        </section>
+
+        <!-- 搜索区域 -->
+        <section class="minimal-search">
+            <div class="minimal-form-group">
+                <label class="minimal-label">添加货币</label>
+                <input type="text" id="coin-search-input" placeholder="搜索加密货币..." class="minimal-input">
+                <div id="search-results" class="minimal-search-results"></div>
+        </div>
+        </section>
+
+        <!-- 已添加货币区域 -->
+        <section class="minimal-coins">
+            <div class="minimal-section-header">
+                <h2 class="minimal-section-title">监控列表</h2>
+                <div class="minimal-section-divider"></div>
+            </div>
+            <div id="tracked-coins-list" class="minimal-coins-grid">
+                <!-- 货币卡片将在这里动态插入 -->
+        </div>
+        </section>
+    </div>
+
+    <!-- 极简弹窗 -->
+    <div id="alert-modal" class="minimal-modal" style="display: none;">
+        <div class="minimal-modal-content">
+            <div class="minimal-modal-header">
+                <h3 id="modal-coin-name" class="minimal-modal-title">设置提醒</h3>
+                <button class="minimal-close-btn">&times;</button>
+            </div>
+
+            <div class="minimal-modal-body">
+                <div class="minimal-form-group">
+                    <label class="minimal-label">触发条件</label>
+                    <select id="alert-condition" class="minimal-select">
+                        <option value="above">价格上涨至</option>
+                        <option value="below">价格下跌至</option>
+                        <option value="crosses">价格穿过</option>
+                    </select>
+                </div>
+
+                <div class="minimal-form-group">
+                    <label class="minimal-label">目标价格</label>
+                    <input type="number" id="alert-price" placeholder="0.00000000" step="0.00000001" class="minimal-input">
+                    <div id="current-price-display" class="minimal-current-price">
+                        <span class="minimal-current-price-label">当前价格：</span>
+                        <span id="current-price-value" class="minimal-current-price-value">--</span>
+                    </div>
+                </div>
+
+                <div class="minimal-form-group">
+                    <label class="minimal-switch-label">
+                        <span class="minimal-switch-text">重复提醒</span>
+                        <div class="minimal-switch">
+                            <input type="checkbox" id="alert-repeat" class="minimal-switch-input">
+                            <span class="minimal-switch-slider"></span>
+                        </div>
+                    </label>
+                </div>
+
+                <div id="interval-group" class="minimal-form-group" style="display: none;">
+                    <label class="minimal-label">提醒间隔</label>
+                    <div class="minimal-interval-inputs">
+                        <input type="number" id="alert-interval-hours" min="0" placeholder="时" class="minimal-input-small">
+                        <input type="number" id="alert-interval-minutes" min="0" placeholder="分" class="minimal-input-small">
+                        <input type="number" id="alert-interval-seconds" min="0" placeholder="秒" class="minimal-input-small">
+                </div>
+            </div>
+
+                <div class="minimal-form-group">
+                    <label class="minimal-label">提醒声音</label>
+                    <div class="minimal-sound-selector">
+                        <select id="alert-sound-select" class="minimal-select">
+                            <option value="sounds/sound1.mp3">声音 1</option>
+                            <option value="sounds/sound2.mp3">声音 2</option>
+                            <option value="sounds/sound3.mp3">声音 3</option>
+                            <option value="sounds/sound4.mp3">声音 4</option>
+                            <option value="sounds/sound5.mp3">声音 5</option>
+                            <option value="sounds/sound6.mp3">声音 6</option>
+                            <option value="sounds/sound7.wav">声音 7</option>
+                </select>
+                        <button id="preview-sound-btn" class="minimal-btn-secondary minimal-sound-preview-btn" title="试听">
+                            <span class="minimal-sound-btn-text">▶</span>
+                        </button>
+                    </div>
+                </div>
+
+                <button id="set-alert-btn" class="minimal-btn-primary">设置提醒</button>
+
+                <div class="minimal-coin-actions">
+                    <button id="remove-coin-btn" class="minimal-btn-danger">删除此货币</button>
+            </div>
+
+                <div class="minimal-alerts-section">
+                    <h4 class="minimal-alerts-title">当前提醒</h4>
+                    <div class="minimal-alerts-divider"></div>
+                    <ul id="active-alerts-list" class="minimal-alerts-list">
+                        <!-- 活动提醒列表 -->
+                </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/custom-select.js"></script>
+    <script src="js/page-notifications.js"></script>
+    <script src="js/global-price-alerts.js"></script>
+    <script src="js/price-alert.js"></script>
+</body>
+</html> 
