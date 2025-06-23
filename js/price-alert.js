@@ -172,10 +172,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Reset form
         alertPriceInput.value = '';
-        alertRepeatCheckbox.checked = false;
-        intervalGroup.style.display = 'none';
+        alertRepeatCheckbox.checked = true;  // 保持重复提醒默认打开
+        intervalGroup.style.display = 'block';  // 保持间隔输入区域显示
         alertIntervalHoursInput.value = '';
-        alertIntervalMinutesInput.value = '';
+        alertIntervalMinutesInput.value = '1';  // 默认1分钟
         alertIntervalSecondsInput.value = '';
         alertSoundSelect.selectedIndex = 0;
         
@@ -489,9 +489,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Update last prices
                 lastPrices[coin.id] = price;
                 
-                // Update current price display in modal if it's open for this coin
+                // Update current price display and input in modal if it's open for this coin
                 if (currentModalCoinId === coin.id && currentPriceValue) {
                     currentPriceValue.textContent = `$${price.toFixed(price < 1 ? 6 : 2)}`;
+                    
+                    // 如果输入框为空，自动设置当前价格
+                    if (!alertPriceInput.value || alertPriceInput.value.trim() === '') {
+                        alertPriceInput.value = price;
+                    }
                 }
             }
         });
@@ -524,9 +529,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const coin = trackedCoins.find(c => c.id === coinId);
         if (coin) {
             modalCoinName.textContent = `${coin.name} 提醒设置`;
-        renderActiveAlerts(coinId);
-            updateCurrentPriceDisplay(coinId);
-        alertModal.style.display = 'flex';
+            
+            // 清除输入框内容，准备设置当前价格
+            alertPriceInput.value = '';
+            
+            // 设置重复提醒默认打开，时间默认为1分钟
+            alertRepeatCheckbox.checked = true;
+            intervalGroup.style.display = 'block';
+            alertIntervalHoursInput.value = '';
+            alertIntervalMinutesInput.value = '1';
+            alertIntervalSecondsInput.value = '';
+            
+            renderActiveAlerts(coinId);
+            updateCurrentPriceDisplayAndInput(coinId);
+            alertModal.style.display = 'flex';
         }
     }
 
@@ -537,6 +553,16 @@ document.addEventListener('DOMContentLoaded', () => {
     function closeModal() {
         alertModal.style.display = 'none';
         currentModalCoinId = null;
+        
+        // 重置表单到默认状态
+        alertPriceInput.value = '';
+        alertCondition.selectedIndex = 0;
+        alertRepeatCheckbox.checked = true;
+        intervalGroup.style.display = 'block';
+        alertIntervalHoursInput.value = '';
+        alertIntervalMinutesInput.value = '1';
+        alertIntervalSecondsInput.value = '';
+        alertSoundSelect.selectedIndex = 0;
     }
 
     function updateCurrentPriceDisplay(coinId) {
@@ -552,6 +578,31 @@ document.addEventListener('DOMContentLoaded', () => {
             currentPriceValue.textContent = '加载中...';
             // 获取实时价格
             fetchCurrentPrice(coinId);
+        }
+    }
+
+    function updateCurrentPriceDisplayAndInput(coinId) {
+        const coin = trackedCoins.find(c => c.id === coinId);
+        if (!coin) return;
+
+        // 尝试从已有的价格数据中获取
+        const priceElement = document.getElementById(`price-${coinId}`);
+        if (priceElement && priceElement.textContent !== '--') {
+            const currentPriceText = priceElement.textContent.replace('$', '').replace(',', '');
+            const currentPrice = parseFloat(currentPriceText);
+            
+            // 更新显示
+            currentPriceValue.textContent = `$${currentPriceText}`;
+            
+            // 设置输入框默认值
+            if (!isNaN(currentPrice)) {
+                alertPriceInput.value = currentPrice;
+            }
+        } else {
+            currentPriceValue.textContent = '加载中...';
+            alertPriceInput.placeholder = '加载中...';
+            // 获取实时价格并设置到输入框
+            fetchCurrentPriceAndSetInput(coinId);
         }
     }
 
@@ -586,6 +637,50 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('获取当前价格失败:', error);
             currentPriceValue.textContent = '获取失败';
+        }
+    }
+
+    async function fetchCurrentPriceAndSetInput(coinId) {
+        try {
+            let price = null;
+            
+            if (currentApiSource === 'coingecko') {
+                const response = await fetch(`${COINGECKO_BASE_URL}/simple/price?ids=${coinId}&vs_currencies=usd`);
+                const data = await response.json();
+                if (data[coinId] && data[coinId].usd) {
+                    price = data[coinId].usd;
+                }
+            } else {
+                // Binance API logic
+                const coin = trackedCoins.find(c => c.id === coinId);
+                if (coin) {
+                    const symbol = `${coin.symbol}USDT`;
+                    const response = await fetch(`${BINANCE_BASE_URL}/ticker/price?symbol=${symbol}`);
+                    const data = await response.json();
+                    if (data.price) {
+                        price = parseFloat(data.price);
+                    }
+                }
+            }
+            
+            if (price !== null) {
+                // 更新显示
+                currentPriceValue.textContent = `$${price.toLocaleString('en-US', { 
+                    minimumFractionDigits: 2, 
+                    maximumFractionDigits: 8 
+                })}`;
+                
+                // 设置输入框默认值
+                alertPriceInput.value = price;
+                alertPriceInput.placeholder = "0.00000000";
+            } else {
+                currentPriceValue.textContent = '获取失败';
+                alertPriceInput.placeholder = "请输入价格";
+            }
+        } catch (error) {
+            console.error('获取当前价格失败:', error);
+            currentPriceValue.textContent = '获取失败';
+            alertPriceInput.placeholder = "请输入价格";
         }
     }
 
